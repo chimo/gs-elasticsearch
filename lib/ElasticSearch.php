@@ -68,6 +68,7 @@ class ElasticSearch extends SearchEngine
             'body' => [
                 'author' => $author->nickname,
                 'text' => $notice->content,
+                'type' => $notice->getVerb(true),
                 'created' => $notice->created
             ]
         ];
