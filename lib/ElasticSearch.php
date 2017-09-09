@@ -35,7 +35,59 @@ class ElasticSearch extends SearchEngine
 
         // Create index if it doesn't exist
         if (!$this->client->indices()->exists([ 'index' => $this->index_name ])) {
-            $response = $this->client->indices()->create([ 'index' => $this->index_name ]);
+            if ($index_suffix === 'notice') {
+                $props = [
+                    'author' => [
+                        'type' => 'string'
+                    ],
+                    'text' => [
+                        'type' => 'string'
+                    ],
+                    'type' => [
+                        'type' => 'string'
+                    ],
+                    'created' => [
+                        'type' => 'date',
+                        'format' => 'yyyy-MM-dd HH:mm:ss'
+                    ]
+                ];
+            } else { // 'profile'
+                $props = [
+                    'nickname' => [
+                        'type' => 'string'
+                    ],
+                    'fullname' => [
+                        'type' => 'string'
+                    ],
+                    'bio' => [
+                        'type' => 'string'
+                    ],
+                    'location' => [
+                        'type' => 'string'
+                    ],
+                    'created' => [
+                        'type' => 'date',
+                        'format' => 'yyyy-MM-dd HH:mm:ss'
+                    ],
+                    'modified' => [
+                        'type' => 'date',
+                        'format' => 'yyyy-MM-dd HH:mm:ss'
+                    ]
+                ];
+            }
+
+            $params = [
+                'index' => $this->index_name,
+                'body' => [
+                    'mappings' => [
+                        'notice' => [
+                            'properties' => $props
+                        ]
+                    ]
+                ]
+            ];
+
+            $response = $this->client->indices()->create($params);
 
             // TODO: Parse response, handle errors
         }
