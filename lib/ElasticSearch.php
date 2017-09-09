@@ -208,11 +208,5 @@ class ElasticSearch extends SearchEngine
 
         return parent::limit($offset, $count, $rss);
     }
-
-    // From SearchEngine class
-    function set_sort_mode($mode)
-    {
-        // TODO
-    }
 }
 
