@@ -13,6 +13,7 @@ class ElasticSearch extends SearchEngine
 {
     private $client;
     private $index_name;
+    private $limit;
     protected $table;
     protected $target;
 
@@ -28,6 +29,7 @@ class ElasticSearch extends SearchEngine
         $this->index_name = $index_name . '-' . $index_suffix;
         $this->index_type = $index_suffix;
         $this->hosts = $hosts;
+        $this->limit = array();
 
         $this->client = ClientBuilder::create()->setHosts($hosts)->build();
 
@@ -119,6 +121,8 @@ class ElasticSearch extends SearchEngine
             ]
         ];
 
+        $params = array_merge($params, $this->limit);
+
         $response = $this->client->search($params);
 
         // TODO: Parse response, handle errors
@@ -145,7 +149,12 @@ class ElasticSearch extends SearchEngine
     // From SearchEngine class
     function limit($offset, $count, $rss = false)
     {
-        // TODO
+        $this->limit = array(
+            'from' => $offset,
+            'size' => $count
+        );
+
+        return parent::limit($offset, $count, $rss);
     }
 
     // From SearchEngine class
