@@ -11,7 +11,6 @@
 Tell `/config.php` to use it with (replace `127.0.0.1:9200` with the address/port of your elasticsearch backend server):
 
 ```
-    $config['elasticsearch']['enabled'] = true;
     $config['elasticsearch']['hosts'] = [ '127.0.0.1:9200' ];
     $config['elasticsearch']['index_name'] = 'gnusocial';
     addPlugin('ElasticSearch');
@@ -26,7 +25,9 @@ You can use the [Lucene query syntax](https://www.elastic.co/guide/en/elasticsea
 Supported fields:
 
 * text: Filters by notice text (default field)
-* author: Filters by notice username
+* author: Notice author (in webfinger format: username@example.org)
+* type: Notice type (ex: post, share, like, etc)
+* created: Date the notice was created
 
 The `/search/notice` page searches notice text by default. You can filter by notice author with the `author` field parameter.
 

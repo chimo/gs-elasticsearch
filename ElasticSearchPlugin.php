@@ -12,17 +12,15 @@ class ElasticSearchPlugin extends Plugin
 
     function onGetSearchEngine(Memcached_DataObject $target, $table, &$search_engine)
     {
-        if ($this->isEnabled()) {
-            $engine = $this->createEngine($target);
+        $engine = $this->createEngine($target);
 
-            // TODO: Error handling
+        // TODO: Error handling
+        //       Consider falling back to built-in search on error
+        //       (i.e.: returning `true`)
 
-            $search_engine = $engine;
+        $search_engine = $engine;
 
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     function onEndNoticeSaveWeb($action, $notice)
@@ -41,14 +39,12 @@ class ElasticSearchPlugin extends Plugin
 
     function handleNoticeSave($notice)
     {
-        if ($this->isEnabled()) {
-            $engine = $this->createEngine(new Notice());
+        $engine = $this->createEngine(new Notice());
 
-            if ($notice->getVerb(true) === 'delete') {
-                $engine->delete($notice);
-            } else {
-                $engine->index($notice);
-            }
+        if ($notice->getVerb(true) === 'delete') {
+            $engine->delete($notice);
+        } else {
+            $engine->index($notice);
         }
     }
 
@@ -73,11 +69,6 @@ class ElasticSearchPlugin extends Plugin
         }
 
         return $index_name;
-    }
-
-    function isEnabled()
-    {
-        return common_config('elasticsearch', 'enabled');
     }
 
     function onPluginVersion(array &$versions)
