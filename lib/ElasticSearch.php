@@ -152,13 +152,14 @@ class ElasticSearch extends SearchEngine
     function indexNotice($notice)
     {
         $author = Profile::getKV('id', $notice->profile_id);
+        $webfinger = $author->getAcctUri(false);
 
         $params = [
             'index' => $this->index_name,
             'type' => $this->index_type,
             'id' => $notice->id,
             'body' => [
-                'author' => $author->nickname,
+                'author' => $webfinger,
                 'text' => $notice->content,
                 'type' => $notice->getVerb(true),
                 'created' => $notice->created
