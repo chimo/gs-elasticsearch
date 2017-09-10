@@ -111,6 +111,44 @@ class ElasticSearch extends SearchEngine
         return $response;
     }
 
+    function delete($object)
+    {
+        switch(get_class($object)) {
+            case 'Notice':
+                $type = 'notice';
+                break;
+            case 'Profile':
+                $type = 'profile';
+                break;
+            default:
+                break;
+        }
+
+        $params = [
+            'index' => $this->index_name,
+            'type' => $type,
+            'id' => $object->getID()
+        ];
+
+        try {
+            $response = $this->client->delete($params);
+
+            common_log(LOG_INFO, "Deleted $type $object->getID() from index");
+        } catch(Missing404Exception $e) { // 404 Errors are okay; log as info
+            common_log(
+                LOG_INFO,
+                "Tried to delete $type $object->getID() but it didn't seem to be indexed"
+            );
+        } catch(Exception $e) { // Log other exceptions as errors
+            common_log(
+                LOG_ERROR,
+                "Unable to delete existing $type $object->getID(): $e->getMessage()"
+            );
+        }
+
+        return $response;
+    }
+
     function indexNotice($notice)
     {
         $author = Profile::getKV('id', $notice->profile_id);

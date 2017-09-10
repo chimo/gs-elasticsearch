@@ -27,26 +27,28 @@ class ElasticSearchPlugin extends Plugin
 
     function onEndNoticeSaveWeb($action, $notice)
     {
-        $this->indexNotice($notice);
+        $this->handleNoticeSave($notice);
 
         return true;
     }
 
     function onEndNoticeSave($notice)
     {
-        $this->indexNotice($notice);
+        $this->handleNoticeSave($notice);
 
         return true;
     }
 
-    function indexNotice($notice)
+    function handleNoticeSave($notice)
     {
         if ($this->isEnabled()) {
             $engine = $this->createEngine(new Notice());
 
-            $response = $engine->index($notice);
-
-            // TODO: Error handling
+            if ($notice->getVerb(true) === 'delete') {
+                $engine->delete($notice);
+            } else {
+                $engine->index($notice);
+            }
         }
     }
 
