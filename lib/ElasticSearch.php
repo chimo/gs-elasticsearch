@@ -87,9 +87,14 @@ class ElasticSearch extends SearchEngine
                 ]
             ];
 
-            $response = $this->client->indices()->create($params);
-
-            // TODO: Parse response, handle errors
+            try {
+                $this->client->indices()->create($params);
+            } catch(Exception $e) {
+                common_log(
+                    LOG_ERROR,
+                    "Unable to create index existing $this->index_name: $e->getMessage()"
+                );
+            }
         }
     }
 
@@ -153,6 +158,17 @@ class ElasticSearch extends SearchEngine
     {
         $author = Profile::getKV('id', $notice->profile_id);
         $webfinger = $author->getAcctUri(false);
+
+        try {
+            $object_type = $notice->getObjectType();
+        } catch(NoObjectTypeException $e) {
+            common_log(
+                LOG_INFO,
+                "Notice $notice->getID() doesn't have an object_type"
+            );
+
+            $object_type = null;
+        }
 
         $params = [
             'index' => $this->index_name,
