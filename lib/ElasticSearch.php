@@ -43,6 +43,9 @@ class ElasticSearch extends SearchEngine
                     'text' => [
                         'type' => 'string'
                     ],
+                    'verb' => [
+                        'type' => 'string'
+                    ],
                     'type' => [
                         'type' => 'string'
                     ],
@@ -177,7 +180,8 @@ class ElasticSearch extends SearchEngine
             'body' => [
                 'author' => $webfinger,
                 'text' => $notice->content,
-                'type' => $notice->getVerb(true),
+                'verb' => $notice->getVerb(true),
+                'type' => $object_type,
                 'created' => $notice->created
             ]
         ];
