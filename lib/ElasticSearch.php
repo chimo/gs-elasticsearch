@@ -237,18 +237,22 @@ class ElasticSearch extends SearchEngine
         $hits = $response['hits']['hits'];
 
         if (count($hits) === 0) {
-            return false;
+            // No results
+            //
+            // Force empty result set because if we don't we end up
+            // displaying the most recent notices (no WHERE clause)
+            $this->target->whereAdd("1 = 2");
+        } else {
+            $ids = array();
+
+            foreach($hits as $hit) {
+                $ids[] = $hit['_id'];
+            }
+
+            $id_set = join(', ', $ids);
+
+            $this->target->whereAdd("id in ($id_set)");
         }
-
-        $ids = array();
-
-        foreach($hits as $hit) {
-            $ids[] = $hit['_id'];
-        }
-
-        $id_set = join(', ', $ids);
-
-        $this->target->whereAdd("id in ($id_set)");
 
         return true;
     }
