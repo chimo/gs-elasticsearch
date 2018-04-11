@@ -141,16 +141,16 @@ class ElasticSearch extends SearchEngine
         try {
             $response = $this->client->delete($params);
 
-            common_log(LOG_INFO, "Deleted $type $object->getID() from index");
+            common_log(LOG_INFO, "Deleted $type $object->id from index");
         } catch(Missing404Exception $e) { // 404 Errors are okay; log as info
             common_log(
                 LOG_INFO,
-                "Tried to delete $type $object->getID() but it didn't seem to be indexed"
+                "Tried to delete $type $object->id but it didn't seem to be indexed"
             );
         } catch(Exception $e) { // Log other exceptions as errors
             common_log(
                 LOG_ERROR,
-                "Unable to delete existing $type $object->getID(): $e->getMessage()"
+                "Unable to delete existing $type $object->id: $e->getMessage()"
             );
         }
 
@@ -167,7 +167,7 @@ class ElasticSearch extends SearchEngine
         } catch(NoObjectTypeException $e) {
             common_log(
                 LOG_INFO,
-                "Notice $notice->getID() doesn't have an object_type"
+                "Notice $notice->id doesn't have an object_type"
             );
 
             $object_type = null;
