@@ -119,6 +119,28 @@ class ElasticSearch extends SearchEngine
         return $response;
     }
 
+    function bulkImportNotices($notices)
+    {
+        $params = array('body' => array());
+
+        foreach($notices as $notice) {
+            $params['body'][] = array(
+                'index' => [
+                    '_index' => 'gnusocial-notice', // TODO
+                    '_type' => 'notice',
+                    '_id' => $notice->id,
+                    'op_type' => 'create'
+                ]
+            );
+
+            $params['body'][] = $this->noticetoES($notice, true);
+        }
+
+        $response = $this->client->bulk($params);
+
+        return $response;
+    }
+
     function delete($object)
     {
         switch(get_class($object)) {
@@ -159,8 +181,22 @@ class ElasticSearch extends SearchEngine
 
     function indexNotice($notice)
     {
-        $author = Profile::getKV('id', $notice->profile_id);
-        $webfinger = $author->getAcctUri(false);
+        $params = $this->noticeToES($notice);
+
+        return $this->client->index($params);
+    }
+
+    function noticeToES($notice, $bulk)
+    {
+        try {
+            $author = Profile::getKV('id', $notice->profile_id);
+            $webfinger = $author->getAcctUri(false);
+        } catch(Exception $e) {
+            // If we can't get the author or webfinger for whatever reason
+            // (this actually sometimes happen), then use an obvious placeholder
+            // value (example.org)
+            $webfinger = 'unknown@example.org';
+        }
 
         try {
             $object_type = $notice->getObjectType();
@@ -174,9 +210,6 @@ class ElasticSearch extends SearchEngine
         }
 
         $params = [
-            'index' => $this->index_name,
-            'type' => $this->index_type,
-            'id' => $notice->id,
             'body' => [
                 'author' => $webfinger,
                 'text' => $notice->content,
@@ -186,7 +219,17 @@ class ElasticSearch extends SearchEngine
             ]
         ];
 
-        return $this->client->index($params);
+        if (!$bulk) {
+            $extraParams = [
+                'id' => $notice->id,
+                'index' => $this->index_name,
+                'type' => $this->index_type,
+            ];
+
+            $params = array_merge($params, $extraParams);
+        }
+
+        return $params;
     }
 
     function indexProfile($profile)
