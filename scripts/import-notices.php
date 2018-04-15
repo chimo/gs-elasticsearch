@@ -3,19 +3,19 @@
 
 define('INSTALLDIR', realpath(dirname(__FILE__) . '/../../../..'));
 
-require_once INSTALLDIR . '/scripts/commandline.inc';
-
-$longoptions = array('since', 'batchsize');
-$shortoptions = 's:b';
+$longoptions = array('since==', 'batchsize==');
+$shortoptions = 's::b::';
 
 $helptext = <<<END_OF_HELP
 import-notices.php [options]
 Import notices missing from the elastic search index.
 
-    -s --since  Start at a specific notice id
+    -s --since      Start at a specific notice id
     -b --batchsize  How many notices to send to ES at one time
 
 END_OF_HELP;
+
+require_once INSTALLDIR . '/scripts/commandline.inc';
 
 $since = get_option_value('s', 'since');
 $batchSize = get_option_value('b', 'batchsize');
@@ -69,7 +69,7 @@ do {
     $response = $engine->bulkImportNotices($notices, $indexName);
 
     $lastId = end($notices)->id;
-    echo "Last idz: $lastId\n";
+    echo "Last id: $lastId\n";
 
     // Collect some stats (skipped, (un)successful import)
     foreach($response['items'] as $item) {
@@ -81,7 +81,7 @@ do {
     }
 
     $index++;
-} while(count($notices) > 0) ;
+} while(count($notices) > 0);
 
 foreach($statuses as $status => $count) {
     switch($status) {
