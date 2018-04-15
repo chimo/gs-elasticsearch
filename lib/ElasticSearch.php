@@ -38,16 +38,16 @@ class ElasticSearch extends SearchEngine
             if ($index_suffix === 'notice') {
                 $props = [
                     'author' => [
-                        'type' => 'string'
+                        'type' => 'keyword'
                     ],
                     'text' => [
-                        'type' => 'string'
+                        'type' => 'text'
                     ],
                     'verb' => [
-                        'type' => 'string'
+                        'type' => 'keyword'
                     ],
                     'type' => [
-                        'type' => 'string'
+                        'type' => 'keyword'
                     ],
                     'created' => [
                         'type' => 'date',
@@ -57,16 +57,16 @@ class ElasticSearch extends SearchEngine
             } else { // 'profile'
                 $props = [
                     'nickname' => [
-                        'type' => 'string'
+                        'type' => 'text'
                     ],
                     'fullname' => [
-                        'type' => 'string'
+                        'type' => 'text'
                     ],
                     'bio' => [
-                        'type' => 'string'
+                        'type' => 'text'
                     ],
                     'location' => [
-                        'type' => 'string'
+                        'type' => 'text'
                     ],
                     'created' => [
                         'type' => 'date',
@@ -251,7 +251,7 @@ class ElasticSearch extends SearchEngine
     }
 
     // From SearchEngine class
-    function query($q)
+    function esQuery($q, $author, $type, $created)
     {
         $default_field = 'text';
 
@@ -259,16 +259,36 @@ class ElasticSearch extends SearchEngine
             $default_field = 'nickname';
         }
 
+        $query = [
+            'bool' => [
+                'must' => [],
+                'filter' => []
+            ],
+        ];
+
+        if ($q) {
+            $query['bool']['must'][] = [
+                'match' => ['text' => $q]
+            ];
+        }
+
+        if ($author) {
+            $query['bool']['filter'][] = [
+                'term' => ['author' => $author]
+            ];
+        }
+
+        if ($type) {
+            $query['bool']['filter'][] = [
+                'term' => ['verb' => $type]
+            ];
+        }
+
         $params = [
             'index' => $this->index_name,
             'type' => $this->index_type,
             'body' => [
-                'query' => [
-                    'query_string' => [
-                        'default_field' => $default_field,
-                        'query' => $q
-                    ]
-                ]
+                'query' => $query
             ]
         ];
 

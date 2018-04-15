@@ -48,6 +48,12 @@ class ElasticSearchPlugin extends Plugin
         }
     }
 
+    function onRouterInitialized($m)
+    {
+        // Hijack the regular search page
+        $m->connect('search/notice', array('action' => 'enoticesearch'));
+    }
+
     function createEngine($target)
     {
         $index_name = $this->getIndexname();
