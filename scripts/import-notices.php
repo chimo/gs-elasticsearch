@@ -5,24 +5,33 @@ define('INSTALLDIR', realpath(dirname(__FILE__) . '/../../../..'));
 
 require_once INSTALLDIR . '/scripts/commandline.inc';
 
-$longoptions = array('since');
-$shortoptions = 's';
+$longoptions = array('since', 'batchsize');
+$shortoptions = 's:b';
 
 $helptext = <<<END_OF_HELP
 import-notices.php [options]
 Import notices missing from the elastic search index.
 
     -s --since  Start at a specific notice id
+    -b --batchsize  How many notices to send to ES at one time
 
 END_OF_HELP;
 
 $since = get_option_value('s', 'since');
+$batchSize = get_option_value('b', 'batchsize');
 
-$limit = 1000;
 $index = 0;
 
-if (!is_null($since)) {
+if (intval($batchSize) > 0) {
+    $limit = intval($batchSize);
+} else {
+    $limit = 1000;
+}
+
+if (intval($since) > 0) {
     $lastId = $since;
+} else {
+    $lastId = 0;
 }
 
 $engine = createEngine();
