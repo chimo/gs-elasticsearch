@@ -36,6 +36,8 @@ if (intval($since) > 0) {
 
 $engine = createEngine();
 
+$indexName = getIndexName();
+
 $statuses = array();
 
 do {
@@ -64,7 +66,7 @@ do {
     // User feedback
     echo 'Importing batch ' . ($index + 1) . " ($limit notices)...\n";
 
-    $response = $engine->bulkImportNotices($notices);
+    $response = $engine->bulkImportNotices($notices, $indexName);
 
     $lastId = end($notices)->id;
     echo "Last idz: $lastId\n";
@@ -95,13 +97,21 @@ foreach($statuses as $status => $count) {
     }
 }
 
-function createEngine() {
+function getIndexName()
+{
     $index_name = common_config('elasticsearch', 'index_name');
-    $hosts = common_config('elasticsearch', 'hosts');
 
     if ($index_name === false) {
         $index_name = 'gnusocial';
     }
+
+    return $index_name;
+}
+
+function createEngine()
+{
+    $hosts = common_config('elasticsearch', 'hosts');
+    $index_name = getIndexName();
 
     if ($hosts === false) {
         $hosts = ['127.0.0.1:9200'];

@@ -119,14 +119,14 @@ class ElasticSearch extends SearchEngine
         return $response;
     }
 
-    function bulkImportNotices($notices)
+    function bulkImportNotices($notices, $indexName)
     {
         $params = array('body' => array());
 
         foreach($notices as $notice) {
             $params['body'][] = array(
                 'index' => [
-                    '_index' => 'gnusocial-notice', // TODO
+                    '_index' => $indexName . '-notice',
                     '_type' => 'notice',
                     '_id' => $notice->id,
                     'op_type' => 'create'
