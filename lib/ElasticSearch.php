@@ -210,23 +210,20 @@ class ElasticSearch extends SearchEngine
         }
 
         $params = [
-            'body' => [
-                'author' => $webfinger,
-                'text' => $notice->content,
-                'verb' => $notice->getVerb(true),
-                'type' => $object_type,
-                'created' => $notice->created
-            ]
+            'author' => $webfinger,
+            'text' => $notice->content,
+            'verb' => $notice->getVerb(true),
+            'type' => $object_type,
+            'created' => $notice->created
         ];
 
         if (!$bulk) {
-            $extraParams = [
+            $params = [
                 'id' => $notice->id,
                 'index' => $this->index_name,
                 'type' => $this->index_type,
+                'body' => $params
             ];
-
-            $params = array_merge($params, $extraParams);
         }
 
         return $params;
