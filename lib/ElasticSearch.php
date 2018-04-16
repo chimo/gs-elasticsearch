@@ -296,6 +296,10 @@ class ElasticSearch extends SearchEngine
             ]
         ];
 
+        if ($this->sort) {
+            $params['body']['sort'] = $this->sort;
+        }
+
         $params = array_merge($params, $this->limit);
 
         $response = $this->client->search($params);
@@ -334,6 +338,37 @@ class ElasticSearch extends SearchEngine
         );
 
         return parent::limit($offset, $count, $rss);
+    }
+
+    function set_sort_mode($mode)
+    {
+        // Sort GS results
+        parent::set_sort_mode($mode);
+
+        // Sort ES results
+        switch($mode) {
+            case 'reverse_chron':
+                $this->sort = [
+                    'created' => [
+                        'order' => 'asc'
+                    ]
+                ];
+                break;
+            case 'nickname_desc':
+                // TODO
+                break;
+            case 'nickname_asc':
+                // TODO
+                break;
+            case 'chron':
+            default:
+                $this->sort = [
+                    'created' => [
+                        'order' => 'desc'
+                    ]
+                ];
+                break;
+        }
     }
 }
 
