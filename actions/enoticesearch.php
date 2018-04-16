@@ -25,7 +25,7 @@ class EnoticesearchAction extends NoticesearchAction
                             303);
         }
 
-        if (!empty($this->q)) {
+        if ($this->q || $this->author || $this->type || $this->created) {
             $stream  = new ElasticSearchNoticeStream(
                                 $this->q,
                                 $this->scoped,
@@ -125,7 +125,7 @@ class EnoticesearchAction extends NoticesearchAction
         $this->elementEnd('fieldset');
         $this->elementEnd('form');
 
-        if ($q) {
+        if ($q || $author || $type || $created) {
             $this->showResults($q, $page);
         }
     }

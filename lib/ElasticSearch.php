@@ -270,6 +270,10 @@ class ElasticSearch extends SearchEngine
             $query['bool']['must'][] = [
                 'match' => ['text' => $q]
             ];
+        } else {
+            $query['bool']['must'][] = [
+                'match_all' => new stdClass()
+            ];
         }
 
         if ($author) {
