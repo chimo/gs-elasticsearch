@@ -120,7 +120,6 @@ class EnoticesearchAction extends NoticesearchAction
 */
 
         $this->element('input', array('type'=>'submit', 'class'=>'submit', 'value'=>_m('BUTTON','Search')));
-        $this->elementEnd('li');
         $this->elementEnd('ul');
         $this->elementEnd('fieldset');
         $this->elementEnd('form');
