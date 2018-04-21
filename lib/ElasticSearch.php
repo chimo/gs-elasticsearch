@@ -181,12 +181,12 @@ class ElasticSearch extends SearchEngine
 
     function indexNotice($notice)
     {
-        $params = $this->noticeToES($notice);
+        $params = $this->noticeToES($notice, false);
 
         return $this->client->index($params);
     }
 
-    function noticeToES($notice, $bulk)
+    function noticeToES($notice, $bulk=false)
     {
         try {
             $author = Profile::getKV('id', $notice->profile_id);
