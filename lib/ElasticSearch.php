@@ -94,7 +94,7 @@ class ElasticSearch extends SearchEngine
                 $this->client->indices()->create($params);
             } catch(Exception $e) {
                 common_log(
-                    LOG_ERROR,
+                    LOG_ERR,
                     "Unable to create index existing $this->index_name: $e->getMessage()"
                 );
             }
@@ -171,7 +171,7 @@ class ElasticSearch extends SearchEngine
             );
         } catch(Exception $e) { // Log other exceptions as errors
             common_log(
-                LOG_ERROR,
+                LOG_ERR,
                 "Unable to delete existing $type $object->id: $e->getMessage()"
             );
         }
