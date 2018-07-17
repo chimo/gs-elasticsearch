@@ -154,6 +154,8 @@ class ElasticSearch extends SearchEngine
                 break;
         }
 
+        $response = false;
+
         $params = [
             'index' => $this->index_name,
             'type' => $type,
@@ -164,7 +166,8 @@ class ElasticSearch extends SearchEngine
             $response = $this->client->delete($params);
 
             common_log(LOG_INFO, "Deleted $type $object->id from index");
-        } catch(Missing404Exception $e) { // 404 Errors are okay; log as info
+        } catch(Elasticsearch\Common\Exceptions\Missing404Exception $e) {
+            // 404 Errors are okay; log as info
             common_log(
                 LOG_INFO,
                 "Tried to delete $type $object->id but it didn't seem to be indexed"
