@@ -138,5 +138,28 @@ class EnoticesearchAction extends NoticesearchAction
     {
         // pass
     }
+
+    // The 'highlight' method of SearchNoticeListItem (noticesearch.php) messes up
+    // the encoding of results sometimes (see issue #2) so this is a copy of
+    // showResults() that uses a regular NoticeList instead of SearchNoticeList
+    // FIXME: We should fix the underlying issue with the highlight() method
+    function showResults($q, $page)
+    {
+        if (Event::handle('StartNoticeSearchShowResults', array($this, $q, $this->notice))) {
+            if ($this->notice->N === 0) {
+                $this->showEmptyResults($q, $page);
+            } else {
+                $terms = preg_split('/[\s,]+/', $q);
+                $nl = new NoticeList($this->notice, $this, $terms); //
+                $cnt = $nl->show();
+                $this->pagination($page > 1,
+                                  $cnt > NOTICES_PER_PAGE,
+                                  $page,
+                                  'noticesearch',
+                                  array('q' => $q));
+            }
+            Event::handle('EndNoticeSearchShowResults', array($this, $q, $this->notice));
+        }
+    }
 }
 
