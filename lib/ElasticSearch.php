@@ -253,8 +253,14 @@ class ElasticSearch extends SearchEngine
         // TODO: Parse response, handle errors
     }
 
+    // Compatibility with /actions/apisearchjson.php
+    function query($q)
+    {
+        return $this->esQuery($q);
+    }
+
     // From SearchEngine class
-    function esQuery($q, $author, $type, $created)
+    public function esQuery($q, $author=null, $type=null, $created=null)
     {
         $default_field = 'text';
 
